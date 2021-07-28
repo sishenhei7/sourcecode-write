@@ -1,5 +1,6 @@
 import methods from 'methods'
 import Route from './route.js'
+import Layer from './layer.js'
 import { consoleAll } from './utils.js'
 
 export default class Router {
@@ -19,6 +20,9 @@ export default class Router {
 
   route(path) {
     const route = new Route(path)
+    const layer = new Layer(path, {}, route.dispatch.bind(route))
+    layer.route = route
+    this.stack.push(layer)
     return route
   }
 
@@ -27,6 +31,7 @@ export default class Router {
       this[method] = function(path, ...args) {
         const route = this.route(path)
         route[method](...args)
+        return this
       }
     })
   }
