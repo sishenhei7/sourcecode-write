@@ -3,16 +3,16 @@ import { decodeParam } from './utils.js'
 
 export default class Layer {
   constructor(path, options, fn) {
+    this.keys = []
     this.params = undefined
     this.path = undefined
     this.handle = fn
-    this.regexp = pathRegexp(path, [], options || {})
+    this.regexp = pathRegexp(path, this.keys, options || {})
 
     this.isRegexpStar = path === '*'
     this.isRegexpSlash = path === '/'
   }
 
-  // layer 主要做的就是这个 match 的工作
   match(path) {
     let match
 
@@ -38,7 +38,21 @@ export default class Layer {
       return false
     }
 
-    // TODO: 解析params
+    this.params = {}
+    this.path = match[0]
+
+    const { params, keys } = this
+    for (let i = 1; i < params.length; i += 1) {
+      const key = keys[i - 1]
+      const prop = key.name
+      const val = decodeParam(match[i])
+
+      if (val !== undefined || !(hasOwnProperty.call(params, prop))) {
+        params[prop] = val
+      }
+    }
+
+    return true
   }
 
   handleRequest(req, res, next) {

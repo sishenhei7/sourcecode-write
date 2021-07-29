@@ -34,7 +34,16 @@ export default class Router {
       let layer, match, route
       while (match !== true && idx < stack.length) {
         layer = match[idx++]
-        match = matchLayer(layer, path)
+        match = layer.match(path)
+        route = layer.route
+
+        if (!match) {
+          continue
+        }
+
+        if (!route) {
+          continue
+        }
 
         // TODO: 继续next
       }
