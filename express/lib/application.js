@@ -16,4 +16,16 @@ export default class App {
     const done = callback || finalhandler(req, res)
     this.router.handle(req, res, done)
   }
+
+  use(path, ...fns) {
+    // 默认 path 为 '/'
+    if (typeof path === 'function') {
+      fns.shift(path)
+      path = '/'
+    }
+
+    fns.forEach(() => {
+
+    })
+  }
 }
