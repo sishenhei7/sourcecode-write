@@ -74,3 +74,47 @@ if (path != null) {
   match = this.regexp.exec(path)
 }
 ```
+
+4.express 里面是怎么处理 options 请求的。（待定）
+
+5.处理 url 的时候，要注意转义：
+
+```js
+try {
+  return decodeURIComponent(val);
+} catch (err) {
+  if (err instanceof URIError) {
+    err.message = 'Failed to decode param \'' + val + '\'';
+    err.status = err.statusCode = 400;
+  }
+
+  throw err;
+}
+```
+
+6.增加局部变量来提升性能：
+
+```js
+var keys = this.keys;
+var params = this.params;
+
+for (var i = 1; i < match.length; i++) {
+  var key = keys[i - 1];
+  var prop = key.name;
+  var val = decode_param(match[i])
+
+  if (val !== undefined || !(hasOwnProperty.call(params, prop))) {
+    params[prop] = val;
+  }
+}
+```
+
+7.有一个缺陷，就是使用hash的时候：
+
+```js
+this.cache = {};
+
+// 应该用下面的形式
+this.cache = Object.create(null)
+this.cache = new Map()
+```

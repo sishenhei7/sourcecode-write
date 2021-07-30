@@ -11,6 +11,7 @@ export default class Router {
 
   handle(req, res, next) {
     const idx = 0
+    const paramcalled = {}
     const { stack } = this
     const { url, params, baseUrl, method } = req
     consoleAll({ url, params, originalUrl, baseUrl, method })
@@ -33,7 +34,7 @@ export default class Router {
 
       let layer, match, route
       while (match !== true && idx < stack.length) {
-        layer = match[idx++]
+        layer = stack[idx++]
         match = layer.match(path)
         route = layer.route
 
@@ -45,8 +46,32 @@ export default class Router {
           continue
         }
 
-        // TODO: 继续next
+        if (err) {
+          match = false
+          contiue
+        }
+        // TODO: 增加对option和head的处理
+        // const { method } = req
       }
+
+      if (!match) {
+        next(err)
+      }
+
+      if (route) {
+        req.route = route
+      }
+
+      req.params = layer.params
+
+      if (err) {
+        layer.handleError(err, req, res, next);
+      } else {
+        layer.handleRequest(req, res, next);
+      }
+
+      // TODO: 对 params 及 paramcalled 的处理
+      // processParams
     }
   }
 
@@ -58,6 +83,10 @@ export default class Router {
     return route
   }
 
+  // processParams(layer, paramCalled, req, res, done) {
+
+  // }
+
   appendMethods() {
     methods.concat('all').forEach((method) => {
       this[method] = function(path, ...args) {
@@ -68,3 +97,7 @@ export default class Router {
     })
   }
 }
+
+// function trimPrefix () {
+
+// }
