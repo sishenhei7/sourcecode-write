@@ -118,3 +118,9 @@ this.cache = {};
 this.cache = Object.create(null)
 this.cache = new Map()
 ```
+
+8.express里面router有一层layer，route也有一层layer，其中router那层的layer是处理url匹配的，route那层的layer是处理method匹配，并处理callback数组的。
+
+
+
+

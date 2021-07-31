@@ -5,12 +5,11 @@ export default class Route {
   constructor(path) {
     this.path = path
     this.stack = []
-    this.methods = Object.create(null)
     this.appendMethods()
   }
 
   dispatch(req, res, done) {
-    const idx = 0
+    let idx = 0
     const { stack } = this
     const method = req.method.toLowerCase()
 
@@ -27,6 +26,7 @@ export default class Route {
         done(err)
       }
 
+      // 如果 method 是undefined，会继续向下运行
       if (layer.method && layer.method !== method) {
         next(err)
       }
@@ -39,13 +39,21 @@ export default class Route {
     }
   }
 
+  all(...fns) {
+    fns.forEach((handle) => {
+      const layer = new Layer('/', {}, handle)
+      layer.method = undefined
+      this.stack.push(layer)
+    })
+  }
+
   appendMethods() {
     methods.concat('all').forEach((method) => {
-      this[method] = function(path, ...args) {
-        args.forEach((handle) => {
-          const layer = new Layer(path, {}, handle)
+      this[method] = function(...fns) {
+        fns.forEach((handle) => {
+          // 因为route这层处理的是method，所以path都是斜杠
+          const layer = new Layer('/', {}, handle)
           layer.method = method
-          this.methods[method] = true
           this.stack.push(layer)
         })
       }

@@ -1,10 +1,12 @@
 import http from 'http'
+import methods from 'methods'
 import finalhandler from 'finalhandler'
 import Router from './router.js'
 
 export default class App {
   constructor() {
     this.router = new Router()
+    this.appendMethods()
   }
 
   listen(...args) {
@@ -26,6 +28,15 @@ export default class App {
 
     fns.forEach(() => {
 
+    })
+  }
+
+  appendMethods() {
+    methods.concat('all').forEach((method) => {
+      this[method] = function(args) {
+        this.router[method](args)
+        return this
+      }
     })
   }
 }

@@ -7,7 +7,7 @@ export default class Layer {
     this.params = undefined
     this.path = undefined
     this.handle = fn
-    this.regexp = pathRegexp(path, this.keys, options || {})
+    this.regexp = pathRegexp.pathToRegexp(path, this.keys, options || {})
 
     this.isRegexpStar = path === '*'
     this.isRegexpSlash = path === '/'

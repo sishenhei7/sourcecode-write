@@ -9,14 +9,13 @@ export default class Router {
     this.appendMethods()
   }
 
-  handle(req, res, next) {
-    const idx = 0
-    const paramcalled = {}
+  handle(req, res, done) {
+    let idx = 0
     const { stack } = this
-    const { url, params, baseUrl, method } = req
+    const { url, params, originalUrl, baseUrl, method } = req
     consoleAll({ url, params, originalUrl, baseUrl, method })
 
-    req.next = next
+    req.next = done
     req.baseUrl = baseUrl || ''
     req.originalUrl = originalUrl || url
 
@@ -24,12 +23,12 @@ export default class Router {
 
     function next(err) {
       if (idx >= stack.length) {
-        setImmediate(next, err)
+        setImmediate(done, err)
       }
 
       const path = getPathname(req)
       if (path == null) {
-        next(err)
+        done(err)
       }
 
       let layer, match, route
@@ -55,7 +54,7 @@ export default class Router {
       }
 
       if (!match) {
-        next(err)
+        return done(err)
       }
 
       if (route) {
