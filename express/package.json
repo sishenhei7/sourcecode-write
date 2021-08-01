@@ -11,8 +11,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "accepts": "^1.3.7",
     "finalhandler": "^1.1.2",
     "methods": "^1.1.2",
     "path-to-regexp": "^6.2.0"
+  },
+  "dependencies": {
+    "setprototypeof": "^1.2.0"
   }
 }

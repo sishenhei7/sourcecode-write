@@ -1,6 +1,7 @@
 import http from 'http'
 import methods from 'methods'
 import finalhandler from 'finalhandler'
+import setPrototypeOf from 'setprototypeof'
 import Router from './router.js'
 
 export default class App {

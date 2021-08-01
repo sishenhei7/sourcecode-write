@@ -5,17 +5,18 @@
 实现一个小型的express，支持一下功能：
 
 1. 基本的服务器
-2. 基本的路由，router和route
+2. 基本的路由，router 和 route
 3. 基本的中间件
-4. res和req的基本功能
-5. 设置header
+4. res 和 req 的基本功能
+5. 设置 header
 
 没有这些功能：
 
 1. 基本的错误处理。(所以需要严格按照基本语法来写，不然程序会崩溃)
 2. 路由只支持简单的正则和params
-3. 不支持async await
-4. 不支持解析url里面的params和query
+3. 不支持 async await
+4. 不支持解析 url 里面的 params 和 query
+5. 不支持 mount 子 express 实例
 
 ## 比较典型的package和实现
 
