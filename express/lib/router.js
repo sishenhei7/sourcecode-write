@@ -82,6 +82,22 @@ export default class Router {
     return route
   }
 
+  use(path, ...fns) {
+    // 默认 path 为 '/'
+    if (typeof path === 'function') {
+      fns.shift(path)
+      path = '/'
+    }
+
+    fns.forEach((fn) => {
+      const layer = new Layer(path, {}, fn)
+      layer.route = undefined
+      this.stack.push(layer)
+    })
+
+    return this
+  }
+
   // processParams(layer, paramCalled, req, res, done) {
 
   // }
