@@ -5,6 +5,7 @@ import Router from './router.js'
 import Request from './request.js'
 import Response from './response.js'
 import middlewareInit from './middleware/init.js'
+import middlewareQuery from './middleware/query.js'
 
 export default class App {
   constructor() {
@@ -25,6 +26,7 @@ export default class App {
 
     this.appendMethods()
     this.use(middlewareInit(this))
+    this.use(middlewareQuery)
   }
 
   listen(...args) {
