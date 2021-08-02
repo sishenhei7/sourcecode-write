@@ -1,13 +1,30 @@
 import http from 'http'
 import methods from 'methods'
 import finalhandler from 'finalhandler'
-import setPrototypeOf from 'setprototypeof'
 import Router from './router.js'
+import Request from './request.js'
+import Response from './response.js'
+import middlewareInit from './middleware/init.js'
 
 export default class App {
   constructor() {
     this.router = new Router()
+
+    this.request = Object.defineProperty(new Request(), 'app', {
+      value: this,
+      configurable: true,
+      enumerable: true,
+      writable: true,
+    })
+    this.response = Object.defineProperty(new Response(), 'app', {
+      value: this,
+      configurable: true,
+      enumerable: true,
+      writable: true,
+    })
+
     this.appendMethods()
+    this.use(middlewareInit(this))
   }
 
   listen(...args) {
@@ -27,8 +44,9 @@ export default class App {
       path = '/'
     }
 
-    fns.forEach(() => {
-
+    const { router } = this
+    fns.forEach((fn) => {
+      router.use(path, fn)
     })
   }
 

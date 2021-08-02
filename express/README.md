@@ -17,6 +17,8 @@
 3. 不支持 async await
 4. 不支持解析 url 里面的 params 和 query
 5. 不支持 mount 子 express 实例
+6. 不支持设置各种 request 头
+7. 不支持模板引擎和相关的 header、link 等配置
 
 ## 比较典型的package和实现
 
@@ -122,6 +124,48 @@ this.cache = new Map()
 
 8.express里面router有一层layer，route也有一层layer，其中router那层的layer是处理url匹配的，route那层的layer是处理method匹配，并处理callback数组的。
 
+9.express 在初始化的时候会自己初始化两个中间件，一个中间件把 query 绑到 res 上面去，一个中间件把自己定义的 request 和 response 分别绑到 req 和 res 上面去：
 
+```js
+module.exports = function query(options) {
+  var opts = merge({}, options)
+  var queryparse = qs.parse;
+
+  if (typeof options === 'function') {
+    queryparse = options;
+    opts = undefined;
+  }
+
+  if (opts !== undefined && opts.allowPrototypes === undefined) {
+    // back-compat for qs module
+    opts.allowPrototypes = true;
+  }
+
+  return function query(req, res, next){
+    if (!req.query) {
+      var val = parseUrl(req).query;
+      req.query = queryparse(val, opts);
+    }
+
+    next();
+  };
+}
+
+exports.init = function(app){
+  return function expressInit(req, res, next){
+    if (app.enabled('x-powered-by')) res.setHeader('X-Powered-By', 'Express');
+    req.res = res;
+    res.req = req;
+    req.next = next;
+
+    setPrototypeOf(req, app.request)
+    setPrototypeOf(res, app.response)
+
+    res.locals = res.locals || Object.create(null);
+
+    next();
+  };
+}
+```
 
 
