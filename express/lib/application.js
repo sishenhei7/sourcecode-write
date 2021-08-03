@@ -9,6 +9,7 @@ import middlewareQuery from './middleware/query.js'
 
 export default class App {
   constructor() {
+    this.settings = new WeakMap()
     this.router = new Router()
 
     this.request = Object.defineProperty(new Request(), 'app', {
@@ -27,6 +28,14 @@ export default class App {
     this.appendMethods()
     this.use(middlewareInit(this))
     this.use(middlewareQuery)
+  }
+
+  get(name) {
+
+  }
+
+  set(name, val) {
+
   }
 
   listen(...args) {
