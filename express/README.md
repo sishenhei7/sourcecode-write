@@ -17,12 +17,49 @@
 3. 不支持 async await
 4. 不支持解析 url 里面的 params 和 query
 5. 不支持 mount 子 express 实例
-6. 不支持设置各种 request 头
+6. 不支持设置各种 request 头，包括 etag 等
 7. 不支持模板引擎和相关的 header、link 等配置
 
 ## 比较典型的package和实现
 
 express 源码里面的一些 package 和实现
+
+1.[etag 库](https://www.npmjs.com/package/etag)。里面判断是一个 fs.Stats 对象还是一个实体，如果是一个 fs.Stats 对象，则使用文件信息中的 size 和 mtime进行拼接；如果是一个实体，则使用 crypto 库取摘要等信息。（其中 toString(16) 好像很奇妙，但是目前我还不知道是什么意思）
+
+```js
+// 主要代码
+var tag = isStats
+  ? stattag(entity)
+  : entitytag(entity)
+
+function stattag (stat) {
+  var mtime = stat.mtime.getTime().toString(16)
+  var size = stat.size.toString(16)
+
+  return '"' + size + '-' + mtime + '"'
+}
+
+function entitytag (entity) {
+  if (entity.length === 0) {
+    // fast-path empty
+    return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"'
+  }
+
+  // compute hash of entity
+  var hash = crypto
+    .createHash('sha1')
+    .update(entity, 'utf8')
+    .digest('base64')
+    .substring(0, 27)
+
+  // compute length of entity
+  var len = typeof entity === 'string'
+    ? Buffer.byteLength(entity, 'utf8')
+    : entity.length
+
+  return '"' + len.toString(16) + '-' + hash + '"'
+}
+```
 
 ## 其它
 
