@@ -8,7 +8,7 @@
 2. 基本的路由，router 和 route
 3. 基本的中间件
 4. res 和 req 的基本功能
-5. 设置 header
+5. 设置 header，支持 etag
 
 没有这些功能：
 
@@ -19,6 +19,7 @@
 5. 不支持 mount 子 express 实例
 6. 不支持设置各种 request 头，包括 etag 等
 7. 不支持模板引擎和相关的 header、link 等配置
+8. 不支持 proxy
 
 ## 比较典型的package和实现
 
@@ -58,6 +59,18 @@ function entitytag (entity) {
     : entity.length
 
   return '"' + len.toString(16) + '-' + hash + '"'
+}
+```
+
+2.[safe-buffer](https://www.npmjs.com/package/safe-buffer)。这个库是用来在各个版本的 nodejs 里面兼容 buffer api的。它会判断 nodejs 里面的 buffer api 是否已经有相关方法，如果有则直接使用这个 buffer api；如果没有则使用这个库的 pollyfill。代码如下：
+
+```js
+if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
+  module.exports = buffer
+} else {
+  // Copy properties from require('buffer')
+  copyProps(buffer, exports)
+  exports.Buffer = SafeBuffer
 }
 ```
 

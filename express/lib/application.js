@@ -6,12 +6,12 @@ import Request from './request.js'
 import Response from './response.js'
 import middlewareInit from './middleware/init.js'
 import middlewareQuery from './middleware/query.js'
+import { generateEtag } from './utils'
 
 export default class App {
   constructor() {
-    this.settings = new WeakMap()
+    this.settings = new Map()
     this.router = new Router()
-
     this.request = Object.defineProperty(new Request(), 'app', {
       value: this,
       configurable: true,
@@ -25,17 +25,24 @@ export default class App {
       writable: true,
     })
 
+    this.setDefaultSettings()
     this.appendMethods()
     this.use(middlewareInit(this))
     this.use(middlewareQuery)
   }
 
   get(name) {
-
+    return this.settings.get(name)
   }
 
   set(name, val) {
+    this.settings.set(name, val)
+  }
 
+  setDefaultSettings() {
+    const env = process.env.NODE_ENV || 'development'
+    this.set('etag fn', generateEtag)
+    this.set('env', env)
   }
 
   listen(...args) {

@@ -1,3 +1,5 @@
+import etag from 'etag'
+import { Buffer } from 'safe-buffer'
 import parseUrl from 'parseUrl'
 
 export const consoleAll = (obj) => {
@@ -29,4 +31,9 @@ export const decodeParam = (str) => {
 
     throw err;
   }
+}
+
+export const generateEtag = (body, encoding) => {
+  const buf = Buffer.isBuffer(body) ? Buffer.from(body, encoding) : body
+  return etag(buf)
 }
