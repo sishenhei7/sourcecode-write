@@ -291,3 +291,5 @@ if (typeof chunk === 'string') {
   }
 }
 ```
+
+13.express 里面没有自动设置 Cache-Control 的方法，需要自己手动设置。
