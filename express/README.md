@@ -74,6 +74,14 @@ if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow)
 }
 ```
 
+3.[send](https://www.npmjs.com/package/send)包以流的形式发送文件，并能够自动加上各种http头。另外，它引入并暴露了一个mime库[mime](https://www.npmjs.com/package/mime)供我们使用。mime库先使用正则获取所传路径的文件后缀，然后通过查询mime-db来获取mime类型，代码如下，并且它支持自定义mime类型。
+
+```js
+path = String(path);
+let last = path.replace(/^.*[/\\]/, '').toLowerCase();
+let ext = last.replace(/^.*\./, '').toLowerCase();
+```
+
 ## 其它
 
 1.扫描 tcp 端口，确认服务已经起来了，使用 nc 命令如下：
