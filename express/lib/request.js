@@ -2,10 +2,6 @@ import http from 'http'
 import accepts from 'accepts'
 
 export default class Request extends http.IncomingMessage {
-  constructor() {
-    super()
-  }
-
   head(name) {
     if (['referrer', 'referer'].includes(name)) {
       return this.head.referer || this.head.referrer

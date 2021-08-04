@@ -5,10 +5,6 @@ const mime = send.mime
 const charsetRegExp = /;\s*charset\s*=/
 
 export default class Response extends http.ServerResponse {
-  constructor() {
-    super()
-  }
-
   status(code) {
     this.statusCode = code
     return this
