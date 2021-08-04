@@ -1,5 +1,6 @@
 import http from 'http'
 import send from 'send'
+import { setCharset } from './utils.js'
 
 const mime = send.mime
 const charsetRegExp = /;\s*charset\s*=/
@@ -32,17 +33,49 @@ export default class Response extends http.ServerResponse {
     return this
   }
 
+  get(name) {
+    this.getHeader(name)
+  }
+
   type(type) {
     const mimeType = type.includes('/') ? type : mime.lookup(type)
     this.set('content-type', mimeType)
   }
 
   send(body) {
+    switch(typeof body) {
+      case 'string':
+        if (!this.get('Content-Type')) {
+          this.type('html')
+        }
+        break
+      case 'boolean':
+      case 'number':
+      case 'object':
+        if (body == null) {
+          body = ''
+        } else if (Buffer.isBuffer(body)) {
+          this.type('bin')
+        } else {
+          this.json(body)
+        }
+        break
+    }
 
+    // 加上 utf-8
+    if (typeof body === 'string') {
+      encoding = 'utf8'
+      type = this.get('Content-Type')
+      this.set('Content-Type', setCharset(type, 'utf-8'))
+    }
+
+    // TODO: 加上 etag
   }
 
   json(obj) {
-
+    const body = JSON.stringify(obj)
+    this.set('Content-Type', 'application/json')
+    return this.send(body)
   }
 
   jsonp(obj) {

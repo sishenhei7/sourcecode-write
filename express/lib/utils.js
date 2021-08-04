@@ -1,6 +1,7 @@
 import etag from 'etag'
 import { Buffer } from 'safe-buffer'
 import parseUrl from 'parseUrl'
+import contentType from 'content-type'
 
 export const consoleAll = (obj) => {
   Object.keys(obj).forEach((key) => {
@@ -37,3 +38,13 @@ export const generateEtag = (body, encoding) => {
   const buf = Buffer.isBuffer(body) ? Buffer.from(body, encoding) : body
   return etag(buf)
 }
+
+exports.setCharset = function setCharset(type, charset) {
+  if (!type || !charset) {
+    return type;
+  }
+
+  var parsed = contentType.parse(type);
+  parsed.parameters.charset = charset;
+  return contentType.format(parsed);
+};
