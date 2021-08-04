@@ -20,6 +20,7 @@
     "path-to-regexp": "^6.2.0",
     "qs": "^6.10.1",
     "safe-buffer": "^5.2.1",
+    "send": "^0.17.1",
     "setprototypeof": "^1.2.0"
   }
 }

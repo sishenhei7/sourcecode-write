@@ -218,4 +218,14 @@ exports.init = function(app){
 }
 ```
 
+10.便捷的把一个数组的所有元素都转换成字符串的方法：
+
+```js
+// not recommended
+const value = val.map(item => String(item))
+
+// recommended
+const value = val.map(String)
+```
+
 
