@@ -10,6 +10,8 @@
 4. res 和 req 的基本功能
 5. 设置 header，支持 etag
 6. jsonp
+7. 设置cookie、redirect
+8. 发送和下载文件
 
 没有这些功能：
 
@@ -72,6 +74,50 @@ if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow)
   // Copy properties from require('buffer')
   copyProps(buffer, exports)
   exports.Buffer = SafeBuffer
+}
+```
+
+另外，这个库，在调用 send api 之后会处理各种 options，然后返回一个继承自 Stream 的 SendStream 对象实例，这个对象有一个 pipe 方法，调用这个 pipe 方法才会调用 createReadStream 方法然后真正发送数据。代码如下:
+
+```js
+function send (req, path, options) {
+  return new SendStream(req, path, options)
+}
+
+SendStream.prototype.stream = function stream (path, options) {
+  // TODO: this is all lame, refactor meeee
+  var finished = false
+  var self = this
+  var res = this.res
+
+  // pipe
+  var stream = fs.createReadStream(path, options)
+  this.emit('stream', stream)
+  stream.pipe(res)
+
+  // response finished, done with the fd
+  onFinished(res, function onfinished () {
+    finished = true
+    destroy(stream)
+  })
+
+  // error handling code-smell
+  stream.on('error', function onerror (err) {
+    // request already finished
+    if (finished) return
+
+    // clean up stream
+    finished = true
+    destroy(stream)
+
+    // error
+    self.onStatError(err)
+  })
+
+  // end
+  stream.on('end', function onend () {
+    self.emit('end')
+  })
 }
 ```
 
