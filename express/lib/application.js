@@ -12,13 +12,13 @@ export default class App {
   constructor() {
     this.settings = new Map()
     this.router = new Router()
-    this.request = Object.defineProperty(new Request(), 'app', {
+    this.request = Object.defineProperty(Request.prototype, 'app', {
       value: this,
       configurable: true,
       enumerable: true,
       writable: true,
     })
-    this.response = Object.defineProperty(new Response(), 'app', {
+    this.response = Object.defineProperty(Response.prototype, 'app', {
       value: this,
       configurable: true,
       enumerable: true,
