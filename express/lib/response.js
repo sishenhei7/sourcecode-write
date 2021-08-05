@@ -43,6 +43,14 @@ export default class Response extends http.ServerResponse {
     this.set('content-type', mimeType)
   }
 
+  append(name, val) {
+    let prev = this.get(name)
+    if (prev) {
+      val = Array.isArray(prev) ? prev.concat(val) : [prev].concat(val)
+    }
+    return this.set(name, val)
+  }
+
   send(body) {
     const { app } = this
 

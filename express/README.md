@@ -9,6 +9,7 @@
 3. 基本的中间件
 4. res 和 req 的基本功能
 5. 设置 header，支持 etag
+6. jsonp
 
 没有这些功能：
 
@@ -80,6 +81,20 @@ if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow)
 path = String(path);
 let last = path.replace(/^.*[/\\]/, '').toLowerCase();
 let ext = last.replace(/^.*\./, '').toLowerCase();
+```
+
+4.[cookie-signature](https://www.npmjs.com/package/cookie-signature)库能够对 cookie 进行签名。它生成摘要的是常用的技术：首先使用 sha256 进行加密，然后使用 base64 生成摘要（sha的全称是secure hash algorithm，md的全程是message-digest，他们都是生成摘要的加密方法，都是不可逆的。hmac是一个建立在hash上面的加密认证技术，它需要一个秘钥）。代码如下：
+
+```js
+exports.sign = function(val, secret){
+  if ('string' != typeof val) throw new TypeError("Cookie value must be provided as a string.");
+  if ('string' != typeof secret) throw new TypeError("Secret string must be provided.");
+  return val + '.' + crypto
+    .createHmac('sha256', secret)
+    .update(val)
+    .digest('base64')
+    .replace(/\=+$/, '');
+};
 ```
 
 ## 其它
@@ -301,3 +316,5 @@ if (this._lastModified && !res.getHeader('Last-Modified')) {
   res.setHeader('Last-Modified', modified)
 }
 ```
+
+14.有一种cookie叫做 signed cookie，它会在普通cookie后面加一个摘要信息防止被篡改。有一种 url 叫做 signed url，它在url的query上面加一些字段，提供用户对url的一些有限的访问控制，比如访问时间限制等。
