@@ -59,7 +59,7 @@ export default class App {
   use(path, ...fns) {
     // 默认 path 为 '/'
     if (typeof path === 'function') {
-      fns.shift(path)
+      fns.unshift(path)
       path = '/'
     }
 
