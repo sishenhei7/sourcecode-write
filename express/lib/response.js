@@ -1,7 +1,7 @@
 import path from 'path'
 import http from 'http'
 import send from 'send'
-import cookie from 'cookir'
+import cookie from 'cookie'
 import encodeUrl from 'encodeurl'
 import onFinished from 'on-finished'
 import contentDisposition from 'content-disposition'
@@ -60,7 +60,7 @@ export default class Response extends http.ServerResponse {
   }
 
   send(body) {
-    const { app } = this
+    const { app, req } = this
 
     // content-type
     switch(typeof body) {

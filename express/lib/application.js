@@ -6,7 +6,7 @@ import Request from './request.js'
 import Response from './response.js'
 import middlewareInit from './middleware/init.js'
 import middlewareQuery from './middleware/query.js'
-import { generateEtag } from './utils'
+import { generateEtag } from './utils.js'
 
 export default class App {
   constructor() {

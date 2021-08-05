@@ -39,7 +39,7 @@ export const generateEtag = (body, encoding) => {
   return etag(buf)
 }
 
-exports.setCharset = function setCharset(type, charset) {
+export const setCharset = (type, charset) => {
   if (!type || !charset) {
     return type;
   }
