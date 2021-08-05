@@ -71,8 +71,8 @@ export default class App {
 
   appendMethods() {
     methods.concat('all').forEach((method) => {
-      this[method] = function(args) {
-        this.router[method](args)
+      this[method] = function(...args) {
+        this.router[method](...args)
         return this
       }
     })
