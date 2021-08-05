@@ -43,6 +43,7 @@ export default class App {
     const env = process.env.NODE_ENV || 'development'
     this.set('etag fn', generateEtag)
     this.set('env', env)
+    this.set('jsonp callback name', 'callback')
   }
 
   listen(...args) {

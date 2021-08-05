@@ -2,8 +2,8 @@ import setPrototypeOf from 'setprototypeof'
 
 export default function (app) {
   return function expressInit(req, res, next) {
-    req.req = req
-    res.res = res
+    req.res = res
+    res.req = req
     res.next = next
 
     setPrototypeOf(req, app.request)
