@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import http from 'http'
 import send from 'send'
 import { setCharset } from './utils.js'
@@ -43,6 +44,7 @@ export default class Response extends http.ServerResponse {
   }
 
   send(body) {
+    // content-type
     switch(typeof body) {
       case 'string':
         if (!this.get('Content-Type')) {
@@ -62,11 +64,25 @@ export default class Response extends http.ServerResponse {
         break
     }
 
-    // 加上 utf-8
+    // string 加上 utf-8
     if (typeof body === 'string') {
       encoding = 'utf8'
       type = this.get('Content-Type')
       this.set('Content-Type', setCharset(type, 'utf-8'))
+    }
+
+    // content-length
+    if (body != null) {
+      let len
+
+      if (Buffer.isBuffer(body)) {
+        len = body.length
+      } else {
+        const buf = Buffer.from(body, encoding)
+        len = buf.length
+      }
+
+      this.set('Content-Length', len)
     }
 
     // TODO: 加上 etag

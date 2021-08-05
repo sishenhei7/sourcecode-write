@@ -292,4 +292,12 @@ if (typeof chunk === 'string') {
 }
 ```
 
-13.express 里面没有自动设置 Cache-Control 的方法，需要自己手动设置。
+13.express 里面没有自动设置 Cache-Control 的方法，需要自己手动设置(但是express有自动设置etag)。在send.js库里面是使用 toUTCString 方法设置 last-modified 头部的，代码如下，其中 stat.mtime 是一个Date对象：
+
+```js
+if (this._lastModified && !res.getHeader('Last-Modified')) {
+  var modified = stat.mtime.toUTCString()
+  debug('modified %s', modified)
+  res.setHeader('Last-Modified', modified)
+}
+```
