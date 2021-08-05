@@ -1,7 +1,9 @@
 import etag from 'etag'
-import { Buffer } from 'safe-buffer'
+import safeBuffer from 'safe-buffer'
 import parseUrl from 'parseUrl'
 import contentType from 'content-type'
+
+const { Buffer } = safeBuffer
 
 export const consoleAll = (obj) => {
   Object.keys(obj).forEach((key) => {

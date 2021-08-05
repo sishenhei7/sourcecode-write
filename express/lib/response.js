@@ -5,13 +5,15 @@ import cookie from 'cookie'
 import encodeUrl from 'encodeurl'
 import onFinished from 'on-finished'
 import contentDisposition from 'content-disposition'
-import { Buffer } from 'safe-buffer'
-import { sign } from 'cookie-signature'
+import safeBuffer from 'safe-buffer'
+import cookieSignature from 'cookie-signature'
 import { setCharset } from './utils.js'
 
 const resolve = path.resolve
 const extname = path.extname
 const mime = send.mime
+const { Buffer } = safeBuffer
+const { sign } = cookieSignature
 const charsetRegExp = /;\s*charset\s*=/
 
 export default class Response extends http.ServerResponse {
