@@ -318,3 +318,7 @@ if (this._lastModified && !res.getHeader('Last-Modified')) {
 ```
 
 14.有一种cookie叫做 signed cookie，它会在普通cookie后面加一个摘要信息防止被篡改。有一种 url 叫做 signed url，它在url的query上面加一些字段，提供用户对url的一些有限的访问控制，比如访问时间限制等。
+
+15.服务器清除cookie的方法是：给这个cookie的value设置为空字符串，然后设置过期时间为new Date(1)。
+
+16.redirect的机制是设置状态码为302，然后设置http头location为要跳转的url，最后发出响应给客户端

@@ -1,6 +1,9 @@
-import { Buffer } from 'buffer'
 import http from 'http'
 import send from 'send'
+import cookie from 'cookir'
+import encodeUrl from 'encodeurl'
+import { Buffer } from 'safe-buffer'
+import { sign } from 'cookie-signature'
 import { setCharset } from './utils.js'
 
 const mime = send.mime
@@ -150,14 +153,56 @@ export default class Response extends http.ServerResponse {
   }
 
   cookie(name, value, options) {
+    const opts = { ...options }
+    const { signed, maxAge, path } = opts
+    const { secret } = this.req
 
+    if (signed && !secret) {
+      throw new Error('cookieParser("secret") required for signed cookies')
+    }
+
+    let val = typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value)
+
+    if (signed) {
+      val = `s:${sign(val, secret)}`
+    }
+
+    if (maxAge != null) {
+      opts.expires = new Date(new Date + maxAge)
+      opts.maxAge /= 1000
+    }
+
+    if (path == null) {
+      opts.path = '/'
+    }
+
+    this.append('Set-Cookie', cookie.serialize(name, val, opts))
+    return this
   }
 
   clearCookie(name, options) {
+    const opts = {
+      expires: new Date(1),
+      path: '/',
+      ...options
+    }
+    this.cookie(name, '', opts)
+  }
 
+  location(url) {
+    let loc = url
+
+    if (url === 'back') {
+      loc = this.req.get('referer') || '/'
+    }
+
+    return this.set('Location', encodeUrl(loc))
   }
 
   redirect(url) {
-
+    this.location(url)
+    this.status(302)
+    this.set('Content-Length', 0)
+    this.end()
   }
 }
