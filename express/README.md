@@ -368,3 +368,5 @@ if (this._lastModified && !res.getHeader('Last-Modified')) {
 15.服务器清除cookie的方法是：给这个cookie的value设置为空字符串，然后设置过期时间为new Date(1)。
 
 16.redirect的机制是设置状态码为302，然后设置http头location为要跳转的url，最后发出响应给客户端
+
+17.session cookie 在 session 结束的时候被删除，session 什么时候结束一般由浏览器决定，一般浏览器在被关闭的时候才会 session 结束；而 sessionStorage 则是在浏览页被关闭的时候就会被删除。

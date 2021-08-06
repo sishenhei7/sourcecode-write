@@ -293,6 +293,8 @@ export default class Response extends http.ServerResponse {
         }
       }
     }
+
+    opts = opts || {}
     opts.headers = headers
 
     const fullPath = resolve(path)

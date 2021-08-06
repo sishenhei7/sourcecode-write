@@ -46,7 +46,7 @@ export default class Router {
 
         if (err) {
           match = false
-          contiue
+          continue
         }
         // TODO: 增加对option和head的处理
         // const { method } = req
