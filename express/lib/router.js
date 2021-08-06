@@ -1,7 +1,7 @@
 import methods from 'methods'
 import Route from './route.js'
 import Layer from './layer.js'
-import { consoleAll, getPathname } from './utils.js'
+import { getPathname } from './utils.js'
 
 export default class Router {
   constructor() {
@@ -12,8 +12,7 @@ export default class Router {
   handle(req, res, done) {
     let idx = 0
     const { stack } = this
-    const { url, params, originalUrl, baseUrl, method } = req
-    consoleAll({ url, params, originalUrl, baseUrl, method })
+    const { url, originalUrl, baseUrl } = req
 
     req.next = done
     req.baseUrl = baseUrl || ''

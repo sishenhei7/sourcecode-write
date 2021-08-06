@@ -62,6 +62,7 @@ export default class Response extends http.ServerResponse {
   }
 
   send(body) {
+    let encoding
     const { app, req } = this
 
     // content-type
@@ -86,9 +87,9 @@ export default class Response extends http.ServerResponse {
 
     // string 加上 utf-8
     if (typeof body === 'string') {
+      const type = this.get('Content-Type')
       encoding = 'utf8'
-      type = this.get('Content-Type')
-      this.set('Content-Type', setCharset(type, 'utf-8'))
+      this.set('Content-Type', setCharset(type, encoding))
     }
 
     if (body != null) {

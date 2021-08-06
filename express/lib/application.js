@@ -31,12 +31,9 @@ export default class App {
     this.use(middlewareQuery)
   }
 
-  get(name) {
-    return this.settings.get(name)
-  }
-
   set(name, val) {
     this.settings.set(name, val)
+    return this
   }
 
   setDefaultSettings() {
@@ -72,6 +69,11 @@ export default class App {
   appendMethods() {
     methods.concat('all').forEach((method) => {
       this[method] = function(...args) {
+        // implement get
+        if (method === 'get' && args.length === 1) {
+          return this.settings.get(...args)
+        }
+
         this.router[method](...args)
         return this
       }

@@ -5,12 +5,6 @@ import contentType from 'content-type'
 
 const { Buffer } = safeBuffer
 
-export const consoleAll = (obj) => {
-  Object.keys(obj).forEach((key) => {
-    console.log(key, obj[key])
-  })
-}
-
 export const getPathname = (req) => {
   try {
     return parseUrl(req).pathname
