@@ -16,13 +16,15 @@
 没有这些功能：
 
 1. 基本的错误处理。(所以需要严格按照基本语法来写，不然程序会崩溃)
-2. 路由只支持简单的正则和params
-3. 不支持 async await
-4. 不支持解析 url 里面的 params 和 query
-5. 不支持 mount 子 express 实例
-6. 不支持设置各种 request 头，包括 etag 等
-7. 不支持模板引擎和相关的 header、link 等配置
-8. 不支持 proxy
+2. 不支持 async await
+3. 不支持 mount 子 express 实例
+4. 不支持设置各种 request 头
+5. 不支持模板引擎和相关的 header、link 等配置
+6. 不支持 proxy
+
+## express架构图
+
+![Express架构图](./express.png)
 
 ## 比较典型的package和实现
 
