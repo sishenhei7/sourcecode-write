@@ -19,7 +19,7 @@ export const decodeParam = (str) => {
   }
 
   try {
-    decodeURIComponent(str)
+    return decodeURIComponent(str)
   } catch (err) {
     if (err instanceof URIError) {
       err.message = `Failed to decode param '${str}'`

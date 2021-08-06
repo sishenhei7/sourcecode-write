@@ -143,6 +143,8 @@ exports.sign = function(val, secret){
 };
 ```
 
+5.[body-parser](https://www.npmjs.com/package/body-parser)库能够解析 request 的 body，然后挂载到 request.body 上面去。它支持 json、raw、text、urlencoded 等的解析。它首先使用 pipe 方法获取 request 里面的内容（由于 http.IncomingMessage 是 request 和 response 的父类，所以 request 和 response 都能使用 pipe方法），然后使用[zlib库](https://www.npmjs.com/package/zlib)对内容进行解压缩（gzip、deflate等压缩），再使用[raw-body库](https://www.npmjs.com/package/raw-body)对内容进行 encoding 解析（utf-8等形式），最后分别对内容进行 json、raw、text、urlencoded 解析并挂载到 res.body 上面去。
+
 ## 其它
 
 1.扫描 tcp 端口，确认服务已经起来了，使用 nc 命令如下：

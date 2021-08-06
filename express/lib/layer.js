@@ -42,7 +42,7 @@ export default class Layer {
     this.path = match[0]
 
     const { params, keys } = this
-    for (let i = 1; i < params.length; i += 1) {
+    for (let i = 1; i < match.length; i += 1) {
       const key = keys[i - 1]
       const prop = key.name
       const val = decodeParam(match[i])
