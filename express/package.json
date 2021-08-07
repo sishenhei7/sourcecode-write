@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --inspect src",
+    "dev": "export DEBUG=* && node --inspect src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -18,6 +18,7 @@
     "content-type": "^1.0.4",
     "cookie": "^0.4.1",
     "cookie-signature": "^1.1.0",
+    "debug": "^4.3.2",
     "encodeurl": "^1.0.2",
     "etag": "^1.8.1",
     "finalhandler": "^1.1.2",

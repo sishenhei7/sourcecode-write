@@ -1,7 +1,10 @@
 import methods from 'methods'
+import createDebug from 'debug'
 import Route from './route.js'
 import Layer from './layer.js'
 import { getPathname } from './utils.js'
+
+const debug = createDebug('express:router')
 
 export default class Router {
   constructor() {
@@ -10,6 +13,7 @@ export default class Router {
   }
 
   handle(req, res, done) {
+    debug('router handle')
     let idx = 0
     const { stack } = this
     const { url, originalUrl, baseUrl } = req
@@ -67,6 +71,8 @@ export default class Router {
       } else {
         layer.handleRequest(req, res, next);
       }
+
+      debug('router handle next')
 
       // TODO: 对 params 及 paramcalled 的处理
       // processParams
