@@ -1,5 +1,6 @@
 import http from 'http'
 import methods from 'methods'
+import createDebug from 'debug'
 import finalhandler from 'finalhandler'
 import Router from './router.js'
 import Request from './request.js'
@@ -7,6 +8,8 @@ import Response from './response.js'
 import middlewareInit from './middleware/init.js'
 import middlewareQuery from './middleware/query.js'
 import { generateEtag } from './utils.js'
+
+const debug = createDebug('express:application')
 
 export default class App {
   constructor() {
@@ -44,11 +47,13 @@ export default class App {
   }
 
   listen(...args) {
+    debug('listen')
     const server = http.createServer(this.handle.bind(this))
     return server.listen(...args)
   }
 
   handle(req, res, callback) {
+    debug('req + res', req.method + ' ' + req.url)
     const done = callback || finalhandler(req, res)
     this.router.handle(req, res, done)
   }
