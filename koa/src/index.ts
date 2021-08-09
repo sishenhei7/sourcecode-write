@@ -1,6 +1,9 @@
-// require('./test.js')
-// const debug = require('debug')('koa:application')
-// debug('index')
-// setTimeout(() => {
-//   debug('index 1s')
-// }, 1000);
+import Koa from '@lib/index'
+
+const app = new Koa()
+
+app.use(async function (ctx: any) {
+  ctx.body = 'Hello World'
+})
+
+app.listen(3000)
