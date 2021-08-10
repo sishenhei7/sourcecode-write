@@ -25,13 +25,17 @@
   "author": "yangzhou",
   "license": "MIT",
   "dependencies": {
+    "@types/on-finished": "^2.3.1",
     "debug": "^4.3.2",
-    "eslint-config-prettier": "^8.3.0"
+    "eslint-config-prettier": "^8.3.0",
+    "koa-compose": "^4.1.0",
+    "on-finished": "^2.3.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
     "@types/debug": "^4.1.7",
+    "@types/koa-compose": "^3.2.5",
     "@types/node": "^14.14.7",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
     "@typescript-eslint/parser": "^4.29.0",
