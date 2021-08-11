@@ -13,7 +13,7 @@ import request, { Request } from './request'
 import response, { Response } from './response'
 import { only } from './utils'
 
-export type middlewareFn = (...args: any[]) => void
+export type middlewareFn = () => Promise<unknown>
 
 export interface ApplicationOptions {
   env?: string
@@ -49,7 +49,7 @@ export default class Application extends Emmiter {
     this.keys = keys
   }
 
-  toJSON() {
+  toJSON(): Partial<Application> {
     return only(this, ['env'])
   }
 
@@ -111,7 +111,7 @@ export default class Application extends Emmiter {
   }
 
   // 中间件的核心原理
-  respond(ctx: Context) {
+  respond(ctx: Context): ServerResponse | void {
     const { response, res, req, status, method, respond, writable } = ctx
     let { body } = ctx
 
@@ -162,7 +162,7 @@ export default class Application extends Emmiter {
     res.end(body)
   }
 
-  onerror<T extends Record<string, unknown>>(err: T) {
+  onerror<T extends Record<string, unknown>>(err: T): void {
     const isNativeError = toString.call(err) === '[object Error]' || err instanceof Error
     if (isNativeError) {
       throw new Error(util.format('non-error thrown: %j', err))
