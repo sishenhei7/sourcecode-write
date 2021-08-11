@@ -1,8 +1,9 @@
 import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
 import Emmiter from 'events'
-import Debug from 'debug'
+import util from 'util'
 import { Stream } from 'stream'
 import { Buffer } from 'buffer'
+import Debug from 'debug'
 import statuses from 'statuses'
 import onfinished from 'on-finished'
 import compose, { ComposedMiddleware } from 'koa-compose'
@@ -18,9 +19,11 @@ export interface ApplicationOptions {
   env?: string
   maxIpsCount?: number
   keys?: string[]
+  silent?: boolean
 }
 
 const debug = Debug('koa:application')
+const toString = Object.prototype.toString
 
 export default class Application extends Emmiter {
   private _middleware: middlewareFn[] = []
@@ -30,6 +33,7 @@ export default class Application extends Emmiter {
   public readonly response: Response
   public readonly env: string
   public readonly maxIpsCount: number
+  public readonly silent: boolean
   public readonly keys?: string[]
 
   constructor(options: ApplicationOptions) {
@@ -38,9 +42,10 @@ export default class Application extends Emmiter {
     this.request = Object.create(request)
     this.response = Object.create(response)
 
-    const { env, maxIpsCount, keys } = options
+    const { env, maxIpsCount, keys, silent } = options
     this.env = env || process.env.NODE_ENV || 'development'
     this.maxIpsCount = maxIpsCount || 0
+    this.silent = !!silent
     this.keys = keys
   }
 
@@ -157,8 +162,17 @@ export default class Application extends Emmiter {
     res.end(body)
   }
 
-  onerror() {
-    // TODO: onerror
-    console.log('onerror')
+  onerror<T extends Record<string, unknown>>(err: T) {
+    const isNativeError = toString.call(err) === '[object Error]' || err instanceof Error
+    if (isNativeError) {
+      throw new Error(util.format('non-error thrown: %j', err))
+    }
+
+    if (err.status === 404 || err.expose || this.silent) {
+      return
+    }
+
+    const msg = err.stack || err.toString()
+    console.error(`\n${(msg as string).replace(/^/gm, '  ')}\n`)
   }
 }
