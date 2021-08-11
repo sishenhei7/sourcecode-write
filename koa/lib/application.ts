@@ -45,7 +45,7 @@ export default class Application extends Emmiter {
   }
 
   toJSON() {
-    return only(this as Record<string, unknown>, ['env'])
+    return only(this, ['env'])
   }
 
   use(fn: middlewareFn): Application {

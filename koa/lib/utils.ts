@@ -1,4 +1,4 @@
-export function only<T extends Record<string, unknown>>(obj: T, keys: string | string[]): Partial<T> {
+export function only<T extends Record<string, any>>(obj: T, keys: string | string[]): Partial<T> {
   obj = obj || {}
   keys = typeof keys === 'string' ? keys.split(/ +/) : keys
   return keys.reduce((accu: Partial<T>, curr: keyof T) => {
