@@ -11,8 +11,17 @@ export interface Context {
   req: IncomingMessage
   res: ServerResponse
 
-  originalUrl: string
+  body: any
+  type: string
+  status: number
+  method: string
+  length: number
+  message: string
   state: Record<string, unknown>
+
+  originalUrl: string
+  respond: boolean
+  writable: boolean
 
   onerror: (err: Error | null) => void
 }

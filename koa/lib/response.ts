@@ -9,6 +9,23 @@ export interface Response {
   res: ServerResponse
   ctx: Context
   request: Request
+
+  length: number
+
+  _explicitNullBody: boolean
+
+  has: (type: string) => boolean
+  remove: (type: string) => void
 }
 
-export default {}
+export default {
+  has(type: string) {
+    // TODO
+    console.log(type)
+  },
+
+  remove(type: string) {
+    // TODO
+    console.log(type)
+  },
+}
