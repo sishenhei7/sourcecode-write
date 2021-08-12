@@ -3,13 +3,17 @@ import Application from './application'
 import { Request } from './request'
 import { Response } from './response'
 
+/**
+ * 上下文
+ * @public
+ */
 export interface Context {
-  request: Request
-  response: Response
-
-  app: Application
   req: IncomingMessage
   res: ServerResponse
+
+  app: Application
+  request: Request
+  response: Response
 
   body: any
   type: string

@@ -1,8 +1,9 @@
 import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
 import Emmiter from 'events'
-import util from 'util'
 import { Stream } from 'stream'
 import { Buffer } from 'buffer'
+import util from 'util'
+
 import Debug from 'debug'
 import statuses from 'statuses'
 import onfinished from 'on-finished'
@@ -13,18 +14,42 @@ import request, { Request } from './request'
 import response, { Response } from './response'
 import { only } from './utils'
 
-export type middlewareFn = () => Promise<unknown>
+/**
+ * 中间件函数
+ *
+ * @param ctx - context
+ */
+export type middlewareFn = (ctx: Context) => Promise<unknown>
 
+/**
+ * Application 的 option 数据
+ *
+ * @param env - Environment, default to 'development'
+ * @param keys - signed cookie keys
+ * @param silent - whether to silent errors
+ * @param proxy - whether to proxy
+ * @param proxyIpHeader - proxy headers, default to 'X-Forwarded-For'
+ * @param maxIpsCount - proxy ip couts, default to 0
+ */
 export interface ApplicationOptions {
   env?: string
-  maxIpsCount?: number
   keys?: string[]
   silent?: boolean
+  proxy?: boolean
+  proxyIpHeader?: string
+  maxIpsCount?: number
 }
 
 const debug = Debug('koa:application')
 const toString = Object.prototype.toString
 
+/**
+ * Application class
+ * @public
+ *
+ * @remarks
+ * inherits from Emmiter
+ */
 export default class Application extends Emmiter {
   private _middleware: middlewareFn[] = []
 
@@ -32,41 +57,80 @@ export default class Application extends Emmiter {
   public readonly request: Request
   public readonly response: Response
   public readonly env: string
-  public readonly maxIpsCount: number
-  public readonly silent: boolean
   public readonly keys?: string[]
+  public readonly silent: boolean
+  public readonly proxy: boolean
+  public readonly proxyIpHeader: string
+  public readonly maxIpsCount: number
 
-  constructor(options: ApplicationOptions) {
+  constructor(options?: ApplicationOptions) {
     super()
     this.context = Object.create(context)
     this.request = Object.create(request)
     this.response = Object.create(response)
 
-    const { env, maxIpsCount, keys, silent } = options
+    const { env, keys, silent, proxy, proxyIpHeader, maxIpsCount } = options || {}
     this.env = env || process.env.NODE_ENV || 'development'
-    this.maxIpsCount = maxIpsCount || 0
-    this.silent = !!silent
     this.keys = keys
+    this.silent = !!silent
+    this.proxy = !!proxy
+    this.proxyIpHeader = proxyIpHeader || 'X-Forwarded-For'
+    this.maxIpsCount = maxIpsCount || 0
   }
 
+  /**
+   * Return JSON representation for settings
+   * @public
+   *
+   * @return settings
+   */
   toJSON(): Partial<Application> {
-    return only(this, ['env'])
+    return only(this, ['env', 'silent', 'proxy', 'proxyIpHeader', 'maxIpsCount'])
   }
 
+  /**
+   * inspect implementation
+   * @public
+   *
+   * @return settings
+   */
+  inspect(): Partial<Application> {
+    return this.toJSON()
+  }
+
+  /**
+   * Use the given middleware
+   * @public
+   *
+   * @param fn - middleware
+   * @return application
+   */
   use(fn: middlewareFn): Application {
     debug('use middleware %s', fn.name || '-')
     this._middleware.push(fn)
     return this
   }
 
+  /**
+   * Shorthand for:
+   * http.createServer(app.callback()).listen(...)
+   * @puclic
+   *
+   * @param args - any
+   * @return server
+   */
   listen(...args: any): Server {
     debug('listen')
     const server = http.createServer(this.requestListener)
     return server.listen(...args)
   }
 
-  requestListener(): RequestListener {
-    const fns = compose(this._middleware)
+  /**
+   * requestListener for http.createServer
+   * @private
+   */
+  private requestListener(): RequestListener {
+    const fns = compose<Context>(this._middleware)
 
     if (!this.listenerCount('error')) {
       this.on('error', this.onerror)
@@ -80,7 +144,15 @@ export default class Application extends Emmiter {
     return handleRequest
   }
 
-  createContext(req: IncomingMessage, res: ServerResponse): Context {
+  /**
+   * Create a context
+   * @private
+   *
+   * @param req - IncomingMessage
+   * @param res - ServerResponse
+   * @return context
+   */
+  private createContext(req: IncomingMessage, res: ServerResponse): Context {
     const context = Object.create(this.context)
     const request = (context.request = Object.create(this.request))
     const response = (context.response = Object.create(this.response))
@@ -95,8 +167,19 @@ export default class Application extends Emmiter {
     return context
   }
 
-  async handleRequest(ctx: Context, fnsMiddleware: ComposedMiddleware<Context>): Promise<ServerResponse | void> {
-    const res = ctx.res
+  /**
+   * Async function to handle Request
+   * @private
+   *
+   * @param ctx - application context
+   * @param fnsMiddleware - composed middleware
+   * @return Promise
+   */
+  private async handleRequest(
+    ctx: Context,
+    fnsMiddleware: ComposedMiddleware<Context>,
+  ): Promise<ServerResponse | void> {
+    const { res } = ctx
     const onerror = (err: Error | null) => ctx.onerror(err)
 
     res.statusCode = 404
@@ -110,8 +193,15 @@ export default class Application extends Emmiter {
     }
   }
 
-  // 中间件的核心原理
-  respond(ctx: Context): ServerResponse | void {
+  /**
+   * Create server response
+   * core for middlewares
+   * @private
+   *
+   * @param ctx - context
+   * @return ServerResponse | void
+   */
+  private respond(ctx: Context): ServerResponse | void {
     const { response, res, req, status, method, respond, writable } = ctx
     let { body } = ctx
 
@@ -162,7 +252,12 @@ export default class Application extends Emmiter {
     res.end(body)
   }
 
-  onerror<T extends Record<string, unknown>>(err: T): void {
+  /**
+   * Application error function
+   * @param err - Error
+   * @return void
+   */
+  private onerror<T extends Record<string, unknown>>(err: T): void {
     const isNativeError = toString.call(err) === '[object Error]' || err instanceof Error
     if (isNativeError) {
       throw new Error(util.format('non-error thrown: %j', err))
