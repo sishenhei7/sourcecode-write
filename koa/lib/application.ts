@@ -9,15 +9,16 @@ import statuses from 'statuses'
 import onfinished from 'on-finished'
 import compose, { ComposedMiddleware } from 'koa-compose'
 
-import context, { Context } from './context'
-import request, { Request } from './request'
-import response, { Response } from './response'
+import Context from './context'
+import Request from './request'
+import Response from './response'
 import { only } from './utils'
 
 /**
  * 中间件函数
  *
  * @param ctx - context
+ * @return promise
  */
 export type middlewareFn = (ctx: Context) => Promise<unknown>
 
@@ -51,7 +52,7 @@ const toString = Object.prototype.toString
  * inherits from Emmiter
  */
 export default class Application extends Emmiter {
-  private _middleware: middlewareFn[] = []
+  private _middlewares: middlewareFn[] = []
 
   public readonly context: Context
   public readonly request: Request
@@ -65,9 +66,9 @@ export default class Application extends Emmiter {
 
   constructor(options?: ApplicationOptions) {
     super()
-    this.context = Object.create(context)
-    this.request = Object.create(request)
-    this.response = Object.create(response)
+    this.context = new Context()
+    this.request = new Request()
+    this.response = new Response()
 
     const { env, keys, silent, proxy, proxyIpHeader, maxIpsCount } = options || {}
     this.env = env || process.env.NODE_ENV || 'development'
@@ -107,7 +108,7 @@ export default class Application extends Emmiter {
    */
   use(fn: middlewareFn): Application {
     debug('use middleware %s', fn.name || '-')
-    this._middleware.push(fn)
+    this._middlewares.push(fn)
     return this
   }
 
@@ -130,7 +131,7 @@ export default class Application extends Emmiter {
    * @private
    */
   private requestListener(): RequestListener {
-    const fns = compose<Context>(this._middleware)
+    const fns = compose(this._middlewares)
 
     if (!this.listenerCount('error')) {
       this.on('error', this.onerror)
@@ -152,7 +153,7 @@ export default class Application extends Emmiter {
    * @param res - ServerResponse
    * @return context
    */
-  private createContext(req: IncomingMessage, res: ServerResponse): Context {
+  private createContext(req: IncomingMessage, res: ServerResponse): Required<Context> {
     const context = Object.create(this.context)
     const request = (context.request = Object.create(this.request))
     const response = (context.response = Object.create(this.response))
@@ -176,7 +177,7 @@ export default class Application extends Emmiter {
    * @return Promise
    */
   private async handleRequest(
-    ctx: Context,
+    ctx: Required<Context>,
     fnsMiddleware: ComposedMiddleware<Context>,
   ): Promise<ServerResponse | void> {
     const { res } = ctx
@@ -201,7 +202,7 @@ export default class Application extends Emmiter {
    * @param ctx - context
    * @return ServerResponse | void
    */
-  private respond(ctx: Context): ServerResponse | void {
+  private respond(ctx: Required<Context>): ServerResponse | void {
     const { response, res, req, status, method, respond, writable } = ctx
     let { body } = ctx
 
@@ -216,7 +217,7 @@ export default class Application extends Emmiter {
       if (!res.headersSent && response.has('Content-Length')) {
         const { length } = response
         if (Number.isInteger(length)) {
-          ctx.length = length
+          ctx.length = length as number
         }
       }
       return res.end()
@@ -257,7 +258,7 @@ export default class Application extends Emmiter {
    * @param err - Error
    * @return void
    */
-  private onerror<T extends Record<string, unknown>>(err: T): void {
+  private onerror(err: Record<string, unknown>): void {
     const isNativeError = toString.call(err) === '[object Error]' || err instanceof Error
     if (isNativeError) {
       throw new Error(util.format('non-error thrown: %j', err))
