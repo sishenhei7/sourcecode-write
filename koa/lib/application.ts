@@ -181,7 +181,7 @@ export default class Application extends Emmiter {
     fnsMiddleware: ComposedMiddleware<Context>,
   ): Promise<ServerResponse | void> {
     const { res } = ctx
-    const onerror = (err: Error | null) => ctx.onerror(err)
+    const onerror = (err: Error | null) => ctx.onerror(err as Record<string, any>)
 
     res.statusCode = 404
     onfinished(res, onerror)
@@ -217,7 +217,7 @@ export default class Application extends Emmiter {
       if (!res.headersSent && response.has('Content-Length')) {
         const { length } = response
         if (Number.isInteger(length)) {
-          ctx.length = length as number
+          ctx.length = length
         }
       }
       return res.end()
@@ -258,7 +258,7 @@ export default class Application extends Emmiter {
    * @param err - Error
    * @return void
    */
-  private onerror(err: Record<string, unknown>): void {
+  private onerror(err: Record<string, any>): void {
     const isNativeError = toString.call(err) === '[object Error]' || err instanceof Error
     if (isNativeError) {
       throw new Error(util.format('non-error thrown: %j', err))
