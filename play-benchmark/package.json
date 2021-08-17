@@ -1,0 +1,9 @@
+{
+  "name": "play-benchmark",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "benchmarked": "^2.0.0"
+  }
+}
