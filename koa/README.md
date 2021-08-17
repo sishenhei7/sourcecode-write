@@ -50,4 +50,18 @@ querystring?: Request.querystring
 querystring?: Request['querystring']
 ```
 
+8.使用indexOf的一个巧妙方法：
+
+```js
+// 一般方法
+layer.methods.indexOf(method) === -1
+
+// 巧妙方法（当然，也可以使用includes）
+~layer.methods.indexOf(method)
+```
+
+9.我们一般使用的 babel 设置是```@babel/preset-env```，这个配置会搜索项目里面的 browserslist 配置（这个是由[browserslist库](https://www.npmjs.com/package/browserslist)来完成的。这个库会先搜索环境变量的BROWSERSLIST，然后是自定义路径里面的文件的配置，最后是```package.json```里面的配置，如果都没有则使用默认配置。默认配置是最新的2个版本的浏览器），然后根据配置把 js 打包成支持各种浏览器的代码，支持的浏览器越低级，转化的新语法越多。
+
+
+
 

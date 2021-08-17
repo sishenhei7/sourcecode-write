@@ -1,5 +1,5 @@
-import Koa from '@lib/index'
-import { Context } from '@lib/context'
+import Koa from '../lib/index'
+import Context from '../lib/context'
 
 const app = new Koa()
 
