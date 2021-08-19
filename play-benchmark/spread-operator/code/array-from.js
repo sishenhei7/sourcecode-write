@@ -1,5 +1,5 @@
-module.exports = spread
+module.exports = arrayFrom
 
-function spread(array) {
-  return Array.from(array)
+function arrayFrom(arr) {
+  return Array.from(arr)
 }

@@ -1,5 +1,5 @@
 module.exports = arrayIndexOfNegation
 
-function arrayIndexOfNegation([arr, item]) {
+function arrayIndexOfNegation(arr, item) {
   return ~arr.indexOf(item)
 }

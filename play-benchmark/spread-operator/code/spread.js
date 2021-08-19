@@ -1,5 +1,5 @@
 module.exports = spread
 
-function spread (array) {
-  return [...array]
+function spread (arr) {
+  return [...arr]
 }
