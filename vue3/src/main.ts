@@ -1,3 +1,5 @@
+/* =======================简易渲染器========================== */
+
 // import * as nodeOps from "./dom";
 // import { createRenderer } from "./render";
 // import "./style.css";
@@ -12,7 +14,7 @@
 // };
 // render(vnode, document.querySelector<HTMLDivElement>("#app")!);
 
-/* ============================================================ */
+/* ======================初步响应式=========================== */
 
 // import { reactive, effect } from './reactive'
 
@@ -30,7 +32,7 @@
 //   proxyObj.test = 33;
 // }, 1000);
 
-/* ============================================================ */
+/* ========================分支的情况============================ */
 
 // import { reactive, effect } from './reactive'
 
@@ -52,7 +54,7 @@
 //   proxyObj.b = 3;
 // }, 1000);
 
-/* ============================================================ */
+/* ========================嵌套的情况============================ */
 
 import { reactive, effect } from './reactive'
 
@@ -63,18 +65,18 @@ const obj = {
 
 const proxyObj = reactive(obj)
 effect(() => {
-  console.log('proxyObj.d', proxyObj.a)
+  console.log('proxyObj.a', proxyObj.a)
   effect(() => {
-    console.log('proxyObj.d', proxyObj.b)
+    console.log('proxyObj.b', proxyObj.b)
   })
 })
 
 setTimeout(() => {
   proxyObj.a = 33;
-  proxyObj.b = 3;
+  // proxyObj.b = 3;
 }, 1000);
 
-/* ============================================================ */
+/* =========================this的情况=========================== */
 
 // import { reactive, effect } from './reactive'
 

@@ -14,9 +14,7 @@ function track(target: any, property: string | Symbol) {
       weakMap.set(target, (map = new Map<string | Symbol, any>()))
     }
     let funcSet = map.get(property)
-    if (!funcSet) {
-      map.set(property, (funcSet = new Set<Function>()))
-    }
+    map.set(property, (funcSet = new Set<Function>(funcSet || null)))
     funcSet.add(activeEffectFunc)
 
     activeEffectFunc.deps.push(funcSet)
@@ -24,8 +22,8 @@ function track(target: any, property: string | Symbol) {
 }
 
 function trigger(target: any, property: string | Symbol) {
-  const funcList = weakMap?.get(target)?.get(property)
-  funcList.forEach((func: Function) => func())
+  const funcSet = weakMap?.get(target)?.get(property)
+  funcSet.forEach((func: Function) => func())
 }
 
 function cleanup(effectFunc: EffectFunc) {
