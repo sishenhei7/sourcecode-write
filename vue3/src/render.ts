@@ -18,12 +18,12 @@ export function createRenderer(nodeOps: NodeOps) {
       return
     }
 
-    const { type, children = [] } = vnode;
+    const { type, children = [] } = vnode
 
-    let node: Element;
+    let node: Element
     if (typeof type === 'string') {
-      node = nodeOps.createElement(type);
-      nodeOps.appendChild(node, container);
+      node = nodeOps.createElement(type)
+      nodeOps.appendChild(node, container)
     }
 
     if (typeof children === 'string') {
@@ -33,12 +33,12 @@ export function createRenderer(nodeOps: NodeOps) {
     }
   }
 
-  const hydrate = () => 1;
+  const hydrate = () => 1
   const mountApp = () => 1
 
   return {
     render,
     hydrate,
-    mountApp
+    mountApp,
   }
 }

@@ -13,4 +13,3 @@ export function insertBefore(node: Element, refNode: Element) {
 export function appendChild(node: Element, parentNode: Element) {
   parentNode.appendChild(node)
 }
-

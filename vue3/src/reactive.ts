@@ -1,47 +1,63 @@
-const weakMap = new WeakMap<object, any>();
-let activeEffectFunc: Function;
+interface EffectFunc extends Function {
+  deps: any[]
+}
+
+const weakMap = new WeakMap<object, any>()
+let activeEffectFunc: EffectFunc
 
 function track(target: any, property: string | Symbol) {
   if (activeEffectFunc) {
-    let map = weakMap.get(target);
+    cleanup(activeEffectFunc)
+
+    let map = weakMap.get(target)
     if (!map) {
-      weakMap.set(target, (map = new Map<string | Symbol, any>()));
+      weakMap.set(target, (map = new Map<string | Symbol, any>()))
     }
-    let funcSet = map.get(property);
+    let funcSet = map.get(property)
     if (!funcSet) {
-      map.set(property, (funcSet = new Set<Function>()));
+      map.set(property, (funcSet = new Set<Function>()))
     }
-    funcSet.add(activeEffectFunc);
+    funcSet.add(activeEffectFunc)
+
+    activeEffectFunc.deps.push(funcSet)
   }
 }
 
 function trigger(target: any, property: string | Symbol) {
-  const funcList = weakMap?.get(target)?.get(property);
+  const funcList = weakMap?.get(target)?.get(property)
   if (funcList?.size > 0) {
-    funcList.forEach((func: Function) => func());
+    funcList.forEach((func: Function) => func())
   }
+}
+
+function cleanup(effectFunc: EffectFunc) {
+  for (const dep of effectFunc.deps) {
+    dep.delete(effectFunc)
+  }
+  effectFunc.deps.length = 0
 }
 
 export function reactive(obj: object): any {
   return new Proxy(obj, {
     get(target, property) {
-      track(target, property);
-      return (target as any)[property];
+      track(target, property)
+      return (target as any)[property]
     },
     set(target, property, value) {
-      (target as any)[property] = value;
-      trigger(target, property);
-      return true;
+      ;(target as any)[property] = value
+      trigger(target, property)
+      return true
     },
-  });
+  })
 }
 
 export function effect(func: Function) {
-  return () => {
-    const lastFunc = activeEffectFunc;
-    activeEffectFunc = func;
-    func();
-    activeEffectFunc = lastFunc;
+  const effectFunc: EffectFunc = (...args: any[]) => {
+    const lastFunc = activeEffectFunc
+    activeEffectFunc = effectFunc
+    func(...args)
+    activeEffectFunc = lastFunc
   }
+  effectFunc.deps = []
+  effectFunc()
 }
-
