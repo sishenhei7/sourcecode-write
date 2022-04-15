@@ -14,7 +14,9 @@ function track(target: any, property: string | Symbol) {
       weakMap.set(target, (map = new Map<string | Symbol, any>()))
     }
     let funcSet = map.get(property)
-    map.set(property, (funcSet = new Set<Function>(funcSet || null)))
+    if (!funcSet) {
+      map.set(property, (funcSet = new Set<Function>()))
+    }
     funcSet.add(activeEffectFunc)
 
     activeEffectFunc.deps.push(funcSet)
@@ -22,8 +24,8 @@ function track(target: any, property: string | Symbol) {
 }
 
 function trigger(target: any, property: string | Symbol) {
-  const funcSet = weakMap?.get(target)?.get(property)
-  funcSet.forEach((func: Function) => func())
+  const funcSet = new Set<Function>(weakMap?.get(target)?.get(property))
+  funcSet.forEach((func: Function) => func !== activeEffectFunc && func())
 }
 
 function cleanup(effectFunc: EffectFunc) {
@@ -33,15 +35,19 @@ function cleanup(effectFunc: EffectFunc) {
   effectFunc.deps.length = 0
 }
 
-export function reactive(obj: object): any {
-  return new Proxy(obj, {
-    get(target, property) {
+export function reactive<T extends object>(obj: T) {
+  return new Proxy<T>(obj, {
+    get(target: Record<string, any>, property: string, receiver: any) {
       track(target, property)
-      return (target as any)[property]
+      return Reflect.get(target, property, receiver)
+      // return target[property]
     },
-    set(target, property, value) {
-      ;(target as any)[property] = value
-      trigger(target, property)
+    set(target: Record<string, any>, property: string, value: any, receiver: any) {
+      if (target[property] !== value) {
+        // target[property] = value
+        trigger(target, property)
+        return Reflect.set(target, property, value, receiver)
+      }
       return true
     },
   })
