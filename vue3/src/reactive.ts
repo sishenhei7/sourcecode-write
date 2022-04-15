@@ -25,9 +25,7 @@ function track(target: any, property: string | Symbol) {
 
 function trigger(target: any, property: string | Symbol) {
   const funcList = weakMap?.get(target)?.get(property)
-  if (funcList?.size > 0) {
-    funcList.forEach((func: Function) => func())
-  }
+  funcList.forEach((func: Function) => func())
 }
 
 function cleanup(effectFunc: EffectFunc) {

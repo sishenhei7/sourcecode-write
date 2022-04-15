@@ -54,25 +54,25 @@
 
 /* ============================================================ */
 
-// import { reactive, effect } from './reactive'
+import { reactive, effect } from './reactive'
 
-// const obj = {
-//   a: 1,
-//   b: 2
-// }
+const obj = {
+  a: 1,
+  b: 2
+}
 
-// const proxyObj = reactive(obj)
-// effect(() => {
-//   console.log('proxyObj.d', proxyObj.a)
-//   effect(() => {
-//     console.log('proxyObj.d', proxyObj.b)
-//   })
-// })
+const proxyObj = reactive(obj)
+effect(() => {
+  console.log('proxyObj.d', proxyObj.a)
+  effect(() => {
+    console.log('proxyObj.d', proxyObj.b)
+  })
+})
 
-// setTimeout(() => {
-//   proxyObj.a = 33;
-//   proxyObj.b = 3;
-// }, 1000);
+setTimeout(() => {
+  proxyObj.a = 33;
+  proxyObj.b = 3;
+}, 1000);
 
 /* ============================================================ */
 
