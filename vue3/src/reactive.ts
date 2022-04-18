@@ -1,5 +1,10 @@
 interface EffectFunc extends Function {
   deps: any[]
+  options?: EffectOptions
+}
+
+interface EffectOptions {
+  scheduler: Function
 }
 
 const weakMap = new WeakMap<object, any>()
@@ -24,8 +29,16 @@ function track(target: any, property: string | Symbol) {
 }
 
 function trigger(target: any, property: string | Symbol) {
-  const funcSet = new Set<Function>(weakMap?.get(target)?.get(property))
-  funcSet.forEach((func: Function) => func !== activeEffectFunc && func())
+  const funcSet = new Set<EffectFunc>(weakMap?.get(target)?.get(property))
+  for (const func of funcSet) {
+    if (func !== activeEffectFunc) {
+      if (func?.options?.scheduler) {
+        func.options.scheduler(func)
+      } else {
+        func()
+      }
+    }
+  }
 }
 
 function cleanup(effectFunc: EffectFunc) {
@@ -40,26 +53,45 @@ export function reactive<T extends object>(obj: T) {
     get(target: Record<string, any>, property: string, receiver: any) {
       track(target, property)
       return Reflect.get(target, property, receiver)
-      // return target[property]
     },
     set(target: Record<string, any>, property: string, value: any, receiver: any) {
       if (target[property] !== value) {
-        // target[property] = value
+        const res = Reflect.set(target, property, value, receiver)
         trigger(target, property)
-        return Reflect.set(target, property, value, receiver)
+        return res
       }
       return true
     },
   })
 }
 
-export function effect(func: Function) {
+export function effect(func: Function, options?: EffectOptions) {
   const effectFunc: EffectFunc = (...args: any[]) => {
     const lastFunc = activeEffectFunc
     activeEffectFunc = effectFunc
-    func(...args)
+    const res = func(...args)
     activeEffectFunc = lastFunc
+    return res
   }
   effectFunc.deps = []
-  effectFunc()
+  effectFunc.options = options
+  return effectFunc()
+}
+
+export function computed(func: Function) {
+  let value: any
+  let isDirty = true
+  return {
+    get value() {
+      if (isDirty) {
+        value = effect(func, {
+          scheduler() {
+            isDirty = true
+          }
+        })
+        isDirty = false
+      }
+      return value
+    }
+  }
 }
