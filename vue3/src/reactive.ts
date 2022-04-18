@@ -4,7 +4,13 @@ interface EffectFunc extends Function {
 }
 
 interface EffectOptions {
-  scheduler: Function
+  scheduler?: Function
+  lazy?: boolean
+}
+
+interface WatchOptions {
+  immediate?: boolean
+  flush?: 'pre' | 'post'
 }
 
 export const weakMap = new WeakMap<object, any>()
@@ -76,7 +82,7 @@ export function effect(func: Function, options?: EffectOptions) {
   }
   effectFunc.deps = []
   effectFunc.options = options
-  return effectFunc()
+  return options?.lazy ? effectFunc : effectFunc()
 }
 
 export function computed(func: Function) {
@@ -85,12 +91,13 @@ export function computed(func: Function) {
   const obj = {
     get value() {
       if (isDirty) {
-        value = effect(func, {
+        const effectFunc = effect(func, {
           scheduler() {
             isDirty = true
             trigger(obj, 'value')
           }
         })
+        value = effectFunc()
         track(obj, 'value')
         isDirty = false
       }
@@ -98,4 +105,44 @@ export function computed(func: Function) {
     }
   }
   return obj
+}
+
+function traverse(value: any, seen = new Set()) {
+  if (typeof value !== 'object' || value === null || seen.has(value)) return
+  seen.add(value)
+  for (const key in value) {
+    traverse(value[key], seen)
+  }
+  return value
+}
+
+export function watch(obj: object | Function, cb: Function, options?: WatchOptions) {
+  let newVal: any, oldVal: any, cleanup: Function
+  const func = () => typeof obj === 'object' ? traverse(obj) : obj()
+  const onValidate = (fn: Function) => cleanup = fn
+  const job = () => {
+    if (cleanup) {
+      cleanup()
+    }
+
+    newVal = effectFunc()
+    cb(newVal, oldVal, onValidate)
+    oldVal = newVal
+  }
+  const effectFunc = effect(func, {
+    lazy: true,
+    scheduler() {
+      if (options?.flush === 'post') {
+        Promise.resolve().then(job)
+      } else {
+        job()
+      }
+    }
+  })
+
+  if (options?.immediate) {
+    job()
+  } else {
+    oldVal = effectFunc()
+  }
 }

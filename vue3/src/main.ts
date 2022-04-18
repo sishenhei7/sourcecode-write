@@ -256,7 +256,91 @@
 
 /* =========================effect里面读计算属性的情况=========================== */
 
-import { reactive, effect, computed, weakMap } from './reactive'
+// import { reactive, effect, computed, weakMap } from './reactive'
+
+// const obj = {
+//   a: 2,
+//   b: 3
+// }
+
+// const proxyObj = reactive(obj)
+// const sum = computed(() => {
+//   console.log('计算属性====')
+//   return proxyObj.a + proxyObj.b
+// })
+// effect(() => {
+//   console.log(sum.value)
+// })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   proxyObj.b += 1
+//   console.log('结束响应式', weakMap)
+// }, 1000);
+
+/* =========================watch的情况=========================== */
+
+// import { reactive, watch } from './reactive'
+
+// const obj = {
+//   a: 2,
+//   b: 3
+// }
+
+// const proxyObj = reactive(obj)
+// watch(proxyObj, () => {
+//   console.log('watch====', proxyObj.a)
+// })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   proxyObj.a += 1
+//   console.log('结束响应式')
+// }, 1000);
+
+/* =========================watch里面的新值和旧值的情况=========================== */
+
+// import { reactive, watch } from './reactive'
+
+// const obj = {
+//   a: 2,
+//   b: 3
+// }
+
+// const proxyObj = reactive(obj)
+// watch(() => proxyObj.a, (newVal: any, oldVal: any) => {
+//   console.log('watch====', newVal, oldVal)
+// })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   proxyObj.a += 1
+//   console.log('结束响应式')
+// }, 1000);
+
+/* =========================watch里面的flush的情况=========================== */
+
+// import { reactive, watch } from './reactive'
+
+// const obj = {
+//   a: 2,
+//   b: 3
+// }
+
+// const proxyObj = reactive(obj)
+// watch(() => proxyObj.a, (newVal: any, oldVal: any) => {
+//   console.log('watch====', newVal, oldVal)
+// }, { flush: 'post' })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   proxyObj.a += 1
+//   console.log('结束响应式')
+// }, 1000);
+
+/* =========================watch里面的onValidate的情况=========================== */
+
+import { reactive, watch } from './reactive'
 
 const obj = {
   a: 2,
@@ -264,16 +348,18 @@ const obj = {
 }
 
 const proxyObj = reactive(obj)
-const sum = computed(() => {
-  console.log('计算属性====')
-  return proxyObj.a + proxyObj.b
-})
-effect(() => {
-  console.log(sum.value)
+watch(() => proxyObj.a, async (newVal: any, oldVal: any, onValidate: Function) => {
+  let expired = false
+  onValidate(() => expired = true)
+  await new Promise(resolve => setTimeout(resolve, 2000))
+  if (!expired) {
+    console.log('watch====', newVal, oldVal)
+  }
 })
 
+proxyObj.a = 22
 setTimeout(() => {
   console.log('开始响应式')
-  proxyObj.b += 1
-  console.log('结束响应式', weakMap)
+  proxyObj.a = 33
+  console.log('结束响应式')
 }, 1000);
