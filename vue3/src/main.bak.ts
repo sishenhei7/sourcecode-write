@@ -1,24 +1,22 @@
+import { reactive, effect } from './reactive.bak'
+
 console.log('===============test===========')
 
-
 const obj = {
-  a: 1
+  a: 1,
+  b: 2,
+  c: true
 }
 
-const proxyObj = new Proxy(obj, {
-  get(target: Record<string, any>, property: string) {
-    return target[property]
-  },
-  set(target: Record<string, any>, property: string, value: any) {
+const proxyObj = reactive(obj)
 
-  }
+effect(() => {
+  console.log(proxyObj.c ? proxyObj.a : proxyObj.b)
 })
-
-const effectFunc = () => {
-  console.log(proxyObj.a)
-}
 
 setTimeout(() => {
   proxyObj.a = 33
+  proxyObj.c = false
+  proxyObj.a = 44
 }, 1000);
 

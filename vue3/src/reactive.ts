@@ -7,13 +7,11 @@ interface EffectOptions {
   scheduler: Function
 }
 
-const weakMap = new WeakMap<object, any>()
+export const weakMap = new WeakMap<object, any>()
 let activeEffectFunc: EffectFunc
 
 function track(target: any, property: string | Symbol) {
   if (activeEffectFunc) {
-    cleanup(activeEffectFunc)
-
     let map = weakMap.get(target)
     if (!map) {
       weakMap.set(target, (map = new Map<string | Symbol, any>()))
@@ -67,10 +65,13 @@ export function reactive<T extends object>(obj: T) {
 
 export function effect(func: Function, options?: EffectOptions) {
   const effectFunc: EffectFunc = (...args: any[]) => {
+    cleanup(effectFunc)
+
     const lastFunc = activeEffectFunc
     activeEffectFunc = effectFunc
     const res = func(...args)
     activeEffectFunc = lastFunc
+
     return res
   }
   effectFunc.deps = []
@@ -81,17 +82,20 @@ export function effect(func: Function, options?: EffectOptions) {
 export function computed(func: Function) {
   let value: any
   let isDirty = true
-  return {
+  const obj = {
     get value() {
       if (isDirty) {
         value = effect(func, {
           scheduler() {
             isDirty = true
+            trigger(obj, 'value')
           }
         })
+        track(obj, 'value')
         isDirty = false
       }
       return value
     }
   }
+  return obj
 }

@@ -73,6 +73,25 @@
 //   proxyObj.b = 3;
 // }, 1000);
 
+/* ======================两个值的情况=========================== */
+
+// import { reactive, effect } from './reactive'
+
+// const obj = {
+//   a: 1,
+//   b: 2
+// }
+
+// const proxyObj = reactive(obj)
+// effect(() => {
+//   console.log(proxyObj.a + proxyObj.b);
+// })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   proxyObj.b = 33;
+// }, 1000);
+
 /* ========================嵌套的情况============================ */
 
 // import { reactive, effect } from './reactive'
@@ -237,14 +256,11 @@
 
 /* =========================effect里面读计算属性的情况=========================== */
 
-import { reactive, effect, computed } from './reactive'
+import { reactive, effect, computed, weakMap } from './reactive'
 
 const obj = {
   a: 2,
-  b: 3,
-  get test () {
-    return this.a
-  }
+  b: 3
 }
 
 const proxyObj = reactive(obj)
@@ -256,7 +272,8 @@ effect(() => {
   console.log(sum.value)
 })
 
-
 setTimeout(() => {
-  proxyObj.a += 1
+  console.log('开始响应式')
+  proxyObj.b += 1
+  console.log('结束响应式', weakMap)
 }, 1000);
