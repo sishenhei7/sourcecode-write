@@ -340,26 +340,108 @@
 
 /* =========================watch里面的onValidate的情况=========================== */
 
-import { reactive, watch } from './reactive'
+// import { reactive, watch } from './reactive'
+
+// const obj = {
+//   a: 2,
+//   b: 3
+// }
+
+// const proxyObj = reactive(obj)
+// watch(() => proxyObj.a, async (newVal: any, oldVal: any, onValidate: Function) => {
+//   let expired = false
+//   onValidate(() => expired = true)
+//   await new Promise(resolve => setTimeout(resolve, 2000))
+//   if (!expired) {
+//     console.log('watch====', newVal, oldVal)
+//   }
+// })
+
+// proxyObj.a = 22
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   proxyObj.a = 33
+//   console.log('结束响应式')
+// }, 1000);
+
+/* =========================ref的情况=========================== */
+
+// import { effect, ref } from './reactive'
+
+// const a = ref(2)
+
+// effect(() => {
+//   console.log('ref====', a.value)
+// })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   a.value += 1
+//   console.log('结束响应式')
+// }, 1000);
+
+/* =========================响应丢失的情况=========================== */
+
+// import { effect, reactive, toRef } from './reactive'
+
+// const obj = {
+//   a: 2
+// }
+
+// const proxyObj = reactive(obj)
+// // const newObj = { ...proxyObj }
+// const newObj = {
+//   a: toRef(proxyObj, 'a')
+// }
+
+// effect(() => {
+//   console.log('newProxyObj.a', newObj.a.value)
+// })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   newObj.a.value += 1
+//   console.log('结束响应式')
+// }, 1000);
+
+/* =========================toRefs的情况=========================== */
+
+// import { effect, reactive, toRefs } from './reactive'
+
+// const obj = {
+//   a: 2
+// }
+
+// const proxyObj = reactive(obj)
+// const newObj = { ...toRefs(proxyObj) }
+
+// effect(() => {
+//   console.log('newProxyObj.a', newObj.a.value)
+// })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   newObj.a.value += 1
+//   console.log('结束响应式')
+// }, 1000);
+
+/* =========================脱ref的情况=========================== */
+
+import { effect, reactive, toRefs, proxyRef } from './reactive'
 
 const obj = {
-  a: 2,
-  b: 3
+  a: 2
 }
 
 const proxyObj = reactive(obj)
-watch(() => proxyObj.a, async (newVal: any, oldVal: any, onValidate: Function) => {
-  let expired = false
-  onValidate(() => expired = true)
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  if (!expired) {
-    console.log('watch====', newVal, oldVal)
-  }
+const newObj = proxyRef({ ...toRefs(proxyObj) })
+
+effect(() => {
+  console.log('newProxyObj.a', newObj.a)
 })
 
-proxyObj.a = 22
 setTimeout(() => {
   console.log('开始响应式')
-  proxyObj.a = 33
+  newObj.a += 1
   console.log('结束响应式')
 }, 1000);

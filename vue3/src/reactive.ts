@@ -146,3 +146,55 @@ export function watch(obj: object | Function, cb: Function, options?: WatchOptio
     oldVal = effectFunc()
   }
 }
+
+export function setRefMark(obj: any) {
+  Object.defineProperty(obj, '__is_ref', {
+    get value() {
+      return true
+    }
+  })
+}
+
+export function ref<T extends number | string | boolean>(value: T) {
+  const ret = {
+    value
+  }
+  setRefMark(ret)
+  return reactive(ret)
+}
+
+export function toRef<T extends object>(obj: T, key: keyof T) {
+  const ret = {
+    value: obj[key]
+  }
+  setRefMark(ret)
+  return reactive(ret)
+}
+
+export function toRefs<T extends object>(obj: T) {
+  const ret = {} as any
+  for (const key in obj) {
+    ret[key] = toRef(obj, key)
+  }
+  setRefMark(ret)
+  return ret
+}
+
+export function proxyRef(obj: any) {
+  return new Proxy(obj, {
+    get(target: any, property: string, receiver: any) {
+      const ret = Reflect.get(target, property, receiver)
+      return target.__is_ref ? ret.value : ret
+    },
+    set(target: any, property: string, value: any, receiver: any) {
+      const ret = target[property]
+
+      if (ret.__is_ref) {
+        ret.value = value
+        return true
+      }
+
+      return Reflect.set(target, property, value, receiver)
+    }
+  })
+}
