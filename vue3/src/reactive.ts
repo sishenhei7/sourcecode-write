@@ -149,9 +149,7 @@ export function watch(obj: object | Function, cb: Function, options?: WatchOptio
 
 export function setRefMark(obj: any) {
   Object.defineProperty(obj, '__is_ref', {
-    get value() {
-      return true
-    }
+    value: true
   })
 }
 
@@ -176,7 +174,6 @@ export function toRefs<T extends object>(obj: T) {
   for (const key in obj) {
     ret[key] = toRef(obj, key)
   }
-  setRefMark(ret)
   return ret
 }
 
@@ -184,7 +181,7 @@ export function proxyRef(obj: any) {
   return new Proxy(obj, {
     get(target: any, property: string, receiver: any) {
       const ret = Reflect.get(target, property, receiver)
-      return target.__is_ref ? ret.value : ret
+      return ret.__is_ref ? ret.value : ret
     },
     set(target: any, property: string, value: any, receiver: any) {
       const ret = target[property]
