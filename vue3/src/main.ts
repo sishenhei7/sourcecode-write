@@ -111,7 +111,29 @@
 
 // setTimeout(() => {
 //   console.log('开始响应式')
-//   proxyObj.a = 33;
+//   proxyObj.b = 33;
+// }, 1000);
+
+/* ========================deep reactive的情况============================ */
+
+// import { reactive, effect, shallowReactive } from './reactive'
+
+// const obj = {
+//   a: {
+//     b: 2
+//   },
+//   c: 3
+// }
+
+// const proxyObj = reactive(obj)
+// // const proxyObj = shallowReactive(obj)
+// effect(() => {
+//   console.log('proxyObj.a.b', proxyObj.a.b)
+// })
+
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   proxyObj.a.b = 33;
 // }, 1000);
 
 /* ========================++的情况============================ */
@@ -427,21 +449,21 @@
 
 /* =========================脱ref的情况=========================== */
 
-import { effect, reactive, toRefs, proxyRef } from './reactive'
+// import { effect, reactive, toRefs, proxyRef } from './reactive'
 
-const obj = {
-  a: 2
-}
+// const obj = {
+//   a: 2
+// }
 
-const proxyObj = reactive(obj)
-const newObj = proxyRef({ ...toRefs(proxyObj) })
+// const proxyObj = reactive(obj)
+// const newObj = proxyRef({ ...toRefs(proxyObj) })
 
-effect(() => {
-  console.log('newProxyObj.a', newObj.a)
-})
+// effect(() => {
+//   console.log('newProxyObj.a', newObj.a)
+// })
 
-setTimeout(() => {
-  console.log('开始响应式')
-  newObj.a += 1
-  console.log('结束响应式')
-}, 1000);
+// setTimeout(() => {
+//   console.log('开始响应式')
+//   newObj.a += 1
+//   console.log('结束响应式')
+// }, 1000);

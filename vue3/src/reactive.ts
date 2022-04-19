@@ -52,20 +52,39 @@ function cleanup(effectFunc: EffectFunc) {
   effectFunc.deps.length = 0
 }
 
-export function reactive<T extends object>(obj: T) {
+function createGetter(isShallow = false) {
+  return function get(target: any, property: string | symbol, receiver: any) {
+    track(target, property)
+    const ret = Reflect.get(target, property, receiver)
+    if (isShallow) {
+      return ret
+    }
+    return typeof ret === 'object' ? reactive(ret) : ret
+  }
+}
+
+function createSetter() {
+  return function set(target: Record<string, any>, property: string, value: any, receiver: any) {
+    if (target[property] !== value) {
+      const res = Reflect.set(target, property, value, receiver)
+      trigger(target, property)
+      return res
+    }
+    return true
+  }
+}
+
+export function reactive<T extends object>(obj: T): any {
   return new Proxy<T>(obj, {
-    get(target: Record<string, any>, property: string, receiver: any) {
-      track(target, property)
-      return Reflect.get(target, property, receiver)
-    },
-    set(target: Record<string, any>, property: string, value: any, receiver: any) {
-      if (target[property] !== value) {
-        const res = Reflect.set(target, property, value, receiver)
-        trigger(target, property)
-        return res
-      }
-      return true
-    },
+    get: createGetter(),
+    set: createSetter(),
+  })
+}
+
+export function shallowReactive<T extends object>(obj: T): any {
+  return new Proxy<T>(obj, {
+    get: createGetter(true),
+    set: createSetter(),
   })
 }
 
