@@ -1,0 +1,17 @@
+{
+  "name": "memory-leak",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --inspect app1.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autocannon": "^7.8.1",
+    "express": "^4.17.3",
+    "fast-levenshtein": "^3.0.0"
+  }
+}
